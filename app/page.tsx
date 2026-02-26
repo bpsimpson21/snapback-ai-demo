@@ -2,18 +2,18 @@ import Link from "next/link";
 
 const DEMOS = [
   {
+    href: "/ai-strategy",
+    icon: "📈",
+    title: "The Case for AI",
+    description:
+      "The economic argument for AI at Snapback — margin math, industry data from 500+ sports orgs, and a 90-day execution roadmap.",
+  },
+  {
     href: "/travel-planner",
     icon: "✈",
     title: "Travel Planner",
     description:
       "AI-generated game-weekend ops briefs — travel, lodging, game-day run of show, content plan, and risk flags.",
-  },
-  {
-    href: "/college-guess",
-    icon: "🏈",
-    title: "College Guess",
-    description:
-      "Trivia challenge — identify the school from progressive clues. Fewer hints used = more points.",
   },
   {
     href: "/world-cup-ai",
@@ -71,9 +71,10 @@ export default function Home() {
               <p className="mt-1.5 text-sm text-gray-400 leading-relaxed">{demo.description}</p>
               <span className="mt-4 inline-block text-xs font-semibold text-snap-yellow group-hover:underline underline-offset-2">
                 {
-                  demo.href === "/about"      ? "Meet the team →" :
-                  demo.href === "/world-cup-ai" ? "See the plan →"  :
-                  demo.href === "/analysis"    ? "Open audit →"    :
+                  demo.href === "/ai-strategy"  ? "Read the case →"  :
+                  demo.href === "/about"         ? "Meet the team →"  :
+                  demo.href === "/world-cup-ai"  ? "See the plan →"   :
+                  demo.href === "/analysis"      ? "Open audit →"     :
                   "Open demo →"
                 }
               </span>

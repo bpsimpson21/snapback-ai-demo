@@ -8,7 +8,6 @@ const NAV_LINKS = [
   { href: "/ai-strategy", label: "AI Strategy" },
   { href: "/", label: "Home" },
   { href: "/travel-planner", label: "Travel Planner" },
-  { href: "/college-guess", label: "College Guess" },
   { href: "/world-cup-ai", label: "World Cup" },
   { href: "/about", label: "Who We Are" },
 ];
