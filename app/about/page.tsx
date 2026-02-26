@@ -8,9 +8,9 @@ const PROFILES = [
     name: "Brennan Simpson",
     image: "/brennan.jpg",
     bio: [
-      "MBA Candidate at Clemson University, concentrating in Financial Management.",
+      "MBA Candidate at Clemson University, concentrating in Data Analytics.",
       "Background in analytics, dashboards, and cost optimization — building tools that turn data into decisions.",
-      "Lifelong DC sports fan with deep knowledge across the NFL, NBA, and MLB landscapes.",
+      "Lifelong DC sports fan with deep knowledge in the NFL, college football, and soccer.",
       "Focused on applying AI to sports media and fan engagement to create smarter, more connected experiences.",
     ],
   },
@@ -75,7 +75,7 @@ export default function AboutPage() {
                     src={person.image}
                     alt={`Headshot of ${person.name}`}
                     fill
-                    className="object-cover"
+                    className="object-cover object-top"
                     sizes="112px"
                   />
                 </div>
@@ -111,6 +111,16 @@ export default function AboutPage() {
               friends who have worked, competed, and built things together for years, we think our
               dynamic fits naturally into that culture. We don&apos;t need a warm-up period to
               figure out how to work together — we already know.
+            </p>
+            <p>
+              That same dynamic is what makes us excited about the summer intern program. We
+              wouldn&apos;t just be two people placed on the same team — we&apos;d arrive with an
+              existing creative shorthand.{" "}
+              <span className="text-white font-medium">
+                The kind of trust that produces better content faster,
+              </span>{" "}
+              because we&apos;re not spending energy figuring each other out. We can pitch
+              together, build together, and push each other&apos;s ideas further from day one.
             </p>
             <p>
               We&apos;re also genuinely excited about AI&apos;s role in the future of sports media.

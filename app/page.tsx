@@ -23,6 +23,13 @@ const DEMOS = [
       "How we use AI to scale Snapback's storytelling and trivia strengths for a global World Cup audience.",
   },
   {
+    href: "/analysis",
+    icon: "📊",
+    title: "YouTube Audit",
+    description:
+      "Public channel analysis — velocity, engagement, and keyword patterns across recent videos.",
+  },
+  {
     href: "/about",
     icon: "👋",
     title: "Who We Are",
@@ -63,7 +70,12 @@ export default function Home() {
               <h2 className="text-white font-semibold">{demo.title}</h2>
               <p className="mt-1.5 text-sm text-gray-400 leading-relaxed">{demo.description}</p>
               <span className="mt-4 inline-block text-xs font-semibold text-snap-yellow group-hover:underline underline-offset-2">
-                {demo.href === "/about" ? "Meet the team →" : demo.href === "/world-cup-ai" ? "See the plan →" : "Open demo →"}
+                {
+                  demo.href === "/about"      ? "Meet the team →" :
+                  demo.href === "/world-cup-ai" ? "See the plan →"  :
+                  demo.href === "/analysis"    ? "Open audit →"    :
+                  "Open demo →"
+                }
               </span>
             </Link>
           ))}
