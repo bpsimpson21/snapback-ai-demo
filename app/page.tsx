@@ -6,35 +6,35 @@ const DEMOS = [
     icon: "📈",
     title: "The Case for AI",
     description:
-      "The economic argument for AI at Snapback — margin math, industry data from 500+ sports orgs, and a 90-day execution roadmap.",
+      "70% of sports media costs are labor. AI unlocks 15% efficiency gains and a 10-point margin expansion — here's the math and the 90-day roadmap.",
   },
   {
     href: "/travel-planner",
     icon: "✈",
     title: "Travel Planner",
     description:
-      "AI-generated game-weekend ops briefs — travel, lodging, game-day run of show, content plan, and risk flags.",
+      "Generates full game-weekend ops briefs in seconds — travel, lodging, run of show, and risk flags.",
   },
   {
     href: "/world-cup-ai",
     icon: "⚽",
     title: "World Cup AI",
     description:
-      "How we use AI to scale Snapback's storytelling and trivia strengths for a global World Cup audience.",
+      "AI-powered content scaling strategy for reaching 5B+ World Cup viewers with Snapback's voice.",
   },
   {
     href: "/analysis",
     icon: "📊",
     title: "YouTube Audit",
     description:
-      "Public channel analysis — velocity, engagement, and keyword patterns across recent videos.",
+      "Automated channel diagnostics — upload velocity, engagement trends, and keyword gaps in one click.",
   },
   {
     href: "/about",
     icon: "👋",
     title: "Who We Are",
     description:
-      "Meet Brennan and David — the team behind the lab, and why they built it for Snapback.",
+      "The operators behind the lab — and why we built it specifically for Snapback.",
   },
 ];
 
