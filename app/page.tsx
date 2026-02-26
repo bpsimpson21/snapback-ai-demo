@@ -16,18 +16,18 @@ const DEMOS = [
       "Generates full game-weekend ops briefs in seconds — travel, lodging, run of show, and risk flags.",
   },
   {
-    href: "/world-cup-ai",
-    icon: "⚽",
-    title: "World Cup AI",
-    description:
-      "AI-powered content scaling strategy for reaching 5B+ World Cup viewers with Snapback's voice.",
-  },
-  {
     href: "/analysis",
     icon: "📊",
     title: "YouTube Audit",
     description:
       "Automated channel diagnostics — upload velocity, engagement trends, and keyword gaps in one click.",
+  },
+  {
+    href: "/world-cup-ai",
+    icon: "⚽",
+    title: "World Cup AI",
+    description:
+      "AI-powered content scaling strategy for reaching 5B+ World Cup viewers with Snapback's voice.",
   },
   {
     href: "/about",
