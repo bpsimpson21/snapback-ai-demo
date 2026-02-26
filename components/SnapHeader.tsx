@@ -5,10 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { href: "/ai-strategy", label: "AI Strategy" },
   { href: "/", label: "Home" },
+  { href: "/ai-strategy", label: "The Case for AI" },
   { href: "/travel-planner", label: "Travel Planner" },
-  { href: "/world-cup-ai", label: "World Cup" },
+  { href: "/analysis", label: "YouTube Audit" },
+  { href: "/world-cup-ai", label: "World Cup AI" },
   { href: "/about", label: "Who We Are" },
 ];
 
