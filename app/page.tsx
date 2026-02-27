@@ -2,6 +2,13 @@ import Link from "next/link";
 
 const DEMOS = [
   {
+    href: "/ai-workflow",
+    icon: "🎬",
+    title: "AI Workflow",
+    description:
+      "A tool-by-tool breakdown of how AI removes 40–50% of mechanical editing hours — mapped directly to Snapback's actual production process.",
+  },
+  {
     href: "/ai-strategy",
     icon: "📈",
     title: "The Case for AI",
@@ -71,10 +78,11 @@ export default function Home() {
               <p className="mt-1.5 text-sm text-gray-400 leading-relaxed">{demo.description}</p>
               <span className="mt-4 inline-block text-xs font-semibold text-snap-yellow group-hover:underline underline-offset-2">
                 {
-                  demo.href === "/ai-strategy"  ? "Read the case →"  :
-                  demo.href === "/about"         ? "Meet the team →"  :
-                  demo.href === "/world-cup-ai"  ? "See the plan →"   :
-                  demo.href === "/analysis"      ? "Open audit →"     :
+                  demo.href === "/ai-workflow"   ? "See the pipeline →" :
+                  demo.href === "/ai-strategy"   ? "Read the case →"   :
+                  demo.href === "/about"         ? "Meet the team →"   :
+                  demo.href === "/world-cup-ai"  ? "See the plan →"    :
+                  demo.href === "/analysis"      ? "Open audit →"      :
                   "Open demo →"
                 }
               </span>

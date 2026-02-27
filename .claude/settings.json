@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "c:\\Users\\bpsim\\snapback-ai-intern\\app"
+    ],
+    "allow": [
+      "Bash(npx next build)"
+    ]
+  }
+}
