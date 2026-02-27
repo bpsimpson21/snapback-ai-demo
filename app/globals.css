@@ -20,3 +20,24 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+.hero-gradient-bg {
+  background: linear-gradient(
+    135deg,
+    #0a0a0a 0%,
+    #111118 25%,
+    #0d1117 50%,
+    #121212 75%,
+    #0a0a0a 100%
+  );
+  background-size: 400% 400%;
+  animation: hero-drift 18s ease infinite;
+}
+
+@keyframes hero-drift {
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 50% 100%; }
+  75% { background-position: 0% 50%; }
+  100% { background-position: 0% 0%; }
+}
