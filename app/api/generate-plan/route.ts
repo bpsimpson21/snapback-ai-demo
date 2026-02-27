@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 const SYSTEM_PROMPT = `You are a travel operations planner for a sports media production company called Snapback Sports. The crew is traveling to shoot content at live sporting events. They need specific, actionable logistics — not generic travel advice. You must return ONLY valid JSON with no markdown formatting, no backticks, no explanation outside the JSON. Include real airline names, real hotel and Airbnb price estimates for 2026, real transit systems, real neighborhood names, real weather averages for the destination during the travel dates, and real safety information. All prices should be in USD.
 
-IMPORTANT: Include real booking/reference URLs wherever possible:
-- Flight options: include the airline's booking page URL (e.g. "https://www.britishairways.com", "https://www.delta.com")
-- Accommodation options: include the hotel chain's website or an Airbnb search URL for the recommended area (e.g. "https://www.airbnb.com/s/Islington--London")
-- Game tickets: include the official ticket source URL (e.g. Ticketmaster UK, NFL ticket exchange, or the team's official page)
-- Content locations: include the location's official website or a Google Maps link
-- Safety briefing: include the US Embassy page URL for the destination country
+IMPORTANT: Include search-friendly, parameterized URLs — NOT generic homepages. Construct URLs that take the user directly to relevant search results:
+- Flight options: use Google Flights with parameters — e.g. "https://www.google.com/travel/flights?q=flights+from+JAX+to+LHR+on+2026-10-01" or the airline's route-specific booking page
+- Accommodation options: use Airbnb search URLs with the destination neighborhood — e.g. "https://www.airbnb.com/s/Islington--London--United-Kingdom/homes?checkin=2026-10-01&checkout=2026-10-13&adults=2" or Booking.com search with destination and dates
+- Game tickets: use Ticketmaster or StubHub search URLs with the event or team name — e.g. "https://www.ticketmaster.com/search?q=Jaguars+London+2026" or "https://www.stubhub.com/search?q=NFL+London+Jaguars"
+- Content locations: use Google Maps search URLs — e.g. "https://www.google.com/maps/search/Tottenham+Hotspur+Stadium"
+- Safety briefing: include the specific US Embassy page for the destination country — e.g. "https://uk.usembassy.gov/"
+If you cannot construct a parameterized URL, fall back to the most specific page on the provider's site rather than a generic homepage.
 
 If the crew is bringing equipment (camera gear, drones, audio kits, lighting, tripods, laptops), factor that into your recommendations:
 - Baggage: note checked bag fees and oversize/overweight policies for equipment cases

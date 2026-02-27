@@ -177,11 +177,23 @@ function fmt(n: number): string {
 
 // ── AI Itinerary renderer ──────────────────────────────────────────────────────
 
-function AIItinerary({ plan }: { plan: TripPlan }) {
+const NEED_TO_SECTION: Record<string, string> = {
+  "Flights": "flights",
+  "Accommodation": "accommodation",
+  "Transit": "transportation",
+  "Game Tickets": "game_tickets",
+  "Shoot Locations": "content_locations",
+  "Weather / Packing": "weather_packing",
+  "Safety Briefing": "safety_briefing",
+};
+
+function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
+  const activeKeys = new Set(needs.map((n) => NEED_TO_SECTION[n]).filter(Boolean));
+
   return (
     <div className="space-y-4">
       {/* Flights */}
-      {plan.flights && (
+      {activeKeys.has("flights") && plan.flights && (
         <Section icon="✈️" title="Flights" defaultOpen delay={0}>
           <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
@@ -213,7 +225,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
       )}
 
       {/* Accommodation */}
-      {plan.accommodation && (
+      {activeKeys.has("accommodation") && plan.accommodation && (
         <Section icon="🏨" title="Accommodation" defaultOpen delay={50}>
           <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
@@ -245,7 +257,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
       )}
 
       {/* Transportation */}
-      {plan.transportation && (
+      {activeKeys.has("transportation") && plan.transportation && (
         <Section icon="🚇" title="Transportation" delay={100}>
           <div className="space-y-4">
             <div className="border border-emerald-400/20 rounded-xl bg-emerald-500/5 p-4">
@@ -272,7 +284,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
       )}
 
       {/* Game Tickets */}
-      {plan.game_tickets && (
+      {activeKeys.has("game_tickets") && plan.game_tickets && (
         <Section icon="🏟️" title="Game Tickets" delay={150}>
           <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
@@ -305,7 +317,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
       )}
 
       {/* Content Locations */}
-      {plan.content_locations && (
+      {activeKeys.has("content_locations") && plan.content_locations && (
         <Section icon="🎥" title="Content Shooting Locations" delay={200}>
           <div className="space-y-5">
             {plan.content_locations.pregame?.length > 0 && (
@@ -349,7 +361,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
       )}
 
       {/* Weather & Packing */}
-      {plan.weather_packing && (
+      {activeKeys.has("weather_packing") && plan.weather_packing && (
         <Section icon="🌦️" title="Weather & Packing" delay={250}>
           <div className="space-y-4">
             <div className="grid sm:grid-cols-3 gap-4">
@@ -378,7 +390,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
       )}
 
       {/* Safety */}
-      {plan.safety_briefing && (
+      {activeKeys.has("safety_briefing") && plan.safety_briefing && (
         <Section icon="🛡️" title="Area Safety Briefing" delay={300}>
           <div className="space-y-4">
             {plan.safety_briefing.overview && (
@@ -1058,7 +1070,7 @@ export default function TravelPlannerPage() {
               </button>
             </div>
           ) : isAI ? (
-            <AIItinerary plan={aiPlan} />
+            <AIItinerary plan={aiPlan} needs={needs} />
           ) : (
             <StaticItinerary />
           )}
