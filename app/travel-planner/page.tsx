@@ -5,10 +5,10 @@ import Link from "next/link";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-interface FlightOption { airline: string; route: string; type: string; price_per_person: string }
-interface AccomOption { type: string; name_or_area: string; price_per_night: string; pros: string }
-interface Game { matchup: string; venue: string; date: string; price_range: string }
-interface Location { name: string; why: string }
+interface FlightOption { airline: string; route: string; type: string; price_per_person: string; url?: string }
+interface AccomOption { type: string; name_or_area: string; price_per_night: string; pros: string; url?: string }
+interface Game { matchup: string; venue: string; date: string; price_range: string; url?: string }
+interface Location { name: string; why: string; url?: string }
 interface SafetyArea { name: string; safety_level: string; notes: string }
 interface BudgetCategory { name: string; low: number; high: number }
 
@@ -19,7 +19,7 @@ interface TripPlan {
   game_tickets: { games: Game[]; media_credential_note: string; estimated_total: string };
   content_locations: { pregame: Location[]; broll: Location[]; between_events: Location[] };
   weather_packing: { forecast: string; temperatures: string; rain_chance: string; pack_list: string[] };
-  safety_briefing: { overview: string; areas: SafetyArea[]; emergency_number: string; nearest_embassy: string };
+  safety_briefing: { overview: string; areas: SafetyArea[]; emergency_number: string; nearest_embassy: string; embassy_url?: string };
   budget_summary: { categories: BudgetCategory[]; total_low: number; total_high: number; budget_status: string; notes: string };
 }
 
@@ -101,8 +101,26 @@ function Bullet({ children, accent = false }: { children: React.ReactNode; accen
   );
 }
 
+function BookingLink({ url, label = "Book →" }: { url?: string; label?: string }) {
+  if (!url) return null;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[11px] text-snap-yellow underline underline-offset-2 hover:text-snap-yellow/80 transition-colors"
+    >
+      {label}
+    </a>
+  );
+}
+
 const INPUT_CLS = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-snap-yellow/60 focus:border-transparent transition";
 const TEXTAREA_CLS = `${INPUT_CLS} resize-none`;
+
+const ALL_EQUIPMENT = [
+  "Camera Gear", "Drone", "Audio Kit", "Lighting", "Tripods", "Laptop/Edit Station",
+];
 
 // ── Loading messages ───────────────────────────────────────────────────────────
 
@@ -169,7 +187,10 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
             <div className="grid sm:grid-cols-2 gap-4">
               {plan.flights.options?.map((opt, i) => (
                 <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
-                  <p className="text-sm text-white font-medium mb-1">{opt.airline}</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm text-white font-medium">{opt.airline}</p>
+                    <BookingLink url={opt.url} />
+                  </div>
                   <p className="text-xs text-gray-400">{opt.route}</p>
                   <p className="text-xs text-gray-500 mt-1">{opt.type} — {opt.price_per_person}/person</p>
                 </div>
@@ -198,7 +219,10 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
             <div className="grid sm:grid-cols-2 gap-4">
               {plan.accommodation.options?.map((opt, i) => (
                 <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
-                  <p className="text-sm font-bold text-white mb-1">{opt.type}: {opt.name_or_area}</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-bold text-white">{opt.type}: {opt.name_or_area}</p>
+                    <BookingLink url={opt.url} label="View →" />
+                  </div>
                   <p className="text-xs text-gray-400 leading-relaxed mb-2">{opt.pros}</p>
                   <p className="text-xs text-gray-500">{opt.price_per_night}/night</p>
                 </div>
@@ -254,7 +278,10 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
             <div className="grid sm:grid-cols-2 gap-4">
               {plan.game_tickets.games?.map((g, i) => (
                 <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">{g.date}</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500">{g.date}</p>
+                    <BookingLink url={g.url} label="Tickets →" />
+                  </div>
                   <p className="text-sm text-white font-medium mb-1">{g.matchup}</p>
                   <p className="text-xs text-gray-400">{g.venue}</p>
                   <p className="text-xs text-gray-500 mt-2">{g.price_range}</p>
@@ -288,7 +315,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
                 </div>
                 <ul className="space-y-1.5">
                   {plan.content_locations.pregame.map((loc, i) => (
-                    <Bullet key={i} accent><span className="text-white font-medium">{loc.name}</span> — {loc.why}</Bullet>
+                    <Bullet key={i} accent><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={loc.url} label="View →" /></Bullet>
                   ))}
                 </ul>
               </div>
@@ -300,7 +327,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
                 </div>
                 <ul className="space-y-1.5">
                   {plan.content_locations.broll.map((loc, i) => (
-                    <Bullet key={i} accent><span className="text-white font-medium">{loc.name}</span> — {loc.why}</Bullet>
+                    <Bullet key={i} accent><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={loc.url} label="View →" /></Bullet>
                   ))}
                 </ul>
               </div>
@@ -312,7 +339,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
                 </div>
                 <ul className="space-y-1.5">
                   {plan.content_locations.between_events.map((loc, i) => (
-                    <Bullet key={i}><span className="text-white font-medium">{loc.name}</span> — {loc.why}</Bullet>
+                    <Bullet key={i}><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={loc.url} label="View →" /></Bullet>
                   ))}
                 </ul>
               </div>
@@ -372,7 +399,7 @@ function AIItinerary({ plan }: { plan: TripPlan }) {
                   <Bullet accent>Emergency: {plan.safety_briefing.emergency_number}</Bullet>
                 )}
                 {plan.safety_briefing.nearest_embassy && (
-                  <Bullet>Nearest US Embassy: {plan.safety_briefing.nearest_embassy}</Bullet>
+                  <Bullet>Nearest US Embassy: {plan.safety_briefing.nearest_embassy} <BookingLink url={plan.safety_briefing.embassy_url} label="View →" /></Bullet>
                 )}
               </ul>
             </div>
@@ -698,6 +725,7 @@ function StaticItinerary() {
 
 export default function TravelPlannerPage() {
   // Form state with defaults
+  const [departingFrom, setDepartingFrom] = useState("Jacksonville, FL");
   const [destination, setDestination] = useState("London, UK");
   const [crewSize, setCrewSize] = useState(2);
   const [arrival, setArrival] = useState("2026-10-01");
@@ -707,6 +735,7 @@ export default function TravelPlannerPage() {
     "Cover Jaguars London games — back-to-back weeks at Tottenham Hotspur Stadium (Oct 4) and Wembley Stadium (Oct 11)"
   );
   const [needs, setNeeds] = useState<string[]>([...ALL_NEEDS]);
+  const [equipment, setEquipment] = useState<string[]>([]);
   const [notes, setNotes] = useState(
     "Need to shoot content day before each game + game day. Rest/edit days in between."
   );
@@ -725,6 +754,12 @@ export default function TravelPlannerPage() {
     );
   }, []);
 
+  const toggleEquipment = useCallback((item: string) => {
+    setEquipment((prev) =>
+      prev.includes(item) ? prev.filter((e) => e !== item) : [...prev, item]
+    );
+  }, []);
+
   const handleGenerate = useCallback(async () => {
     if (!destination.trim()) return;
     setLoading(true);
@@ -737,6 +772,7 @@ export default function TravelPlannerPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          departing_from: departingFrom,
           destination,
           crew_size: crewSize,
           arrival,
@@ -744,6 +780,7 @@ export default function TravelPlannerPage() {
           budget,
           purpose,
           needs,
+          equipment,
           notes,
         }),
       });
@@ -769,7 +806,7 @@ export default function TravelPlannerPage() {
     } finally {
       setLoading(false);
     }
-  }, [destination, crewSize, arrival, departure, budget, purpose, needs, notes]);
+  }, [departingFrom, destination, crewSize, arrival, departure, budget, purpose, needs, equipment, notes]);
 
   const isAI = aiPlan !== null;
 
@@ -817,6 +854,18 @@ export default function TravelPlannerPage() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-1.5 block">
+                  Departing From
+                </label>
+                <input
+                  type="text"
+                  value={departingFrom}
+                  onChange={(e) => setDepartingFrom(e.target.value)}
+                  className={INPUT_CLS}
+                  placeholder="e.g. Jacksonville, FL"
+                />
+              </div>
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-1.5 block">
                   Destination
@@ -912,6 +961,31 @@ export default function TravelPlannerPage() {
                   );
                 })}
               </div>
+            </div>
+
+            <div className="mt-5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2 block">
+                Equipment
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {ALL_EQUIPMENT.map((item) => {
+                  const active = equipment.includes(item);
+                  return (
+                    <button
+                      key={item}
+                      onClick={() => toggleEquipment(item)}
+                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                        active
+                          ? "border-snap-yellow/40 bg-snap-yellow/10 text-snap-yellow"
+                          : "border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-gray-600 mt-1.5">Select gear you&apos;re bringing — AI factors in baggage, transport sizing, storage, and regulations</p>
             </div>
 
             <div className="mt-5">
