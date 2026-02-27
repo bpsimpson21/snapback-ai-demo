@@ -2,18 +2,18 @@ import Link from "next/link";
 
 const DEMOS = [
   {
-    href: "/ai-workflow",
-    icon: "🎬",
-    title: "AI Workflow",
-    description:
-      "A tool-by-tool breakdown of how AI removes 40–50% of mechanical editing hours — mapped directly to Snapback's actual production process.",
-  },
-  {
     href: "/ai-strategy",
     icon: "📈",
     title: "The Case for AI",
     description:
       "70% of sports media costs are labor. AI unlocks 15% efficiency gains and a 10-point margin expansion — here's the math and the 90-day roadmap.",
+  },
+  {
+    href: "/ai-workflow",
+    icon: "🎬",
+    title: "AI Workflow",
+    description:
+      "A tool-by-tool breakdown of how AI removes 40–50% of mechanical editing hours — mapped directly to Snapback's actual production process.",
   },
   {
     href: "/travel-planner",
