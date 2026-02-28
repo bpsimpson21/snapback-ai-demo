@@ -12,6 +12,26 @@ interface Location { name: string; why: string; url?: string }
 interface SafetyArea { name: string; safety_level: string; notes: string }
 interface BudgetCategory { name: string; low: number; high: number }
 
+interface AdditionalItem {
+  name: string;
+  description: string;
+  location?: string;
+  priceRange?: string;
+  bookingTip?: string;
+  linkQuery: string;
+}
+
+interface AdditionalSection {
+  id: string;
+  title: string;
+  icon: string;
+  items: AdditionalItem[];
+  recommendation?: string;
+  estimatedCost?: string;
+  estimatedCostLow?: number;
+  estimatedCostHigh?: number;
+}
+
 interface TripPlan {
   flights: { options: FlightOption[]; recommendation: string; estimated_total: string };
   accommodation: { options: AccomOption[]; recommendation: string; estimated_total: string };
@@ -21,6 +41,7 @@ interface TripPlan {
   weather_packing: { forecast: string; temperatures: string; rain_chance: string; pack_list: string[] };
   safety_briefing: { overview: string; areas: SafetyArea[]; emergency_number: string; nearest_embassy: string; embassy_url?: string };
   budget_summary: { categories: BudgetCategory[]; total_low: number; total_high: number; budget_status: string; notes: string };
+  additionalSections?: AdditionalSection[];
 }
 
 // ── Animation helpers ──────────────────────────────────────────────────────────
@@ -438,9 +459,59 @@ function AIItinerary({ plan, needs, ctx }: { plan: TripPlan; needs: string[]; ct
         </Section>
       )}
 
+      {/* Dynamic Additional Sections */}
+      {plan.additionalSections && plan.additionalSections.length > 0 &&
+        plan.additionalSections.map((section, sIdx) => (
+          <Section key={section.id} icon={section.icon} title={section.title} defaultOpen delay={350 + sIdx * 50}>
+            <div className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                {section.items.map((item, idx) => (
+                  <div key={idx} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-white">{item.name}</p>
+                        {item.location && (
+                          <p className="text-xs text-gray-500 mt-0.5">{item.location}</p>
+                        )}
+                        <p className="text-xs text-gray-400 leading-relaxed mt-1">{item.description}</p>
+                        {item.priceRange && (
+                          <p className="text-xs text-gray-500 mt-1">{item.priceRange}</p>
+                        )}
+                        {item.bookingTip && (
+                          <p className="text-[11px] text-snap-yellow/80 mt-2 italic">
+                            💡 {item.bookingTip}
+                          </p>
+                        )}
+                      </div>
+                      <BookingLink url={gSearch(item.linkQuery)} label="View →" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {section.recommendation && (
+                <div className="border border-emerald-400/20 bg-emerald-500/5 rounded-xl p-4">
+                  <p className="text-xs text-emerald-400 font-semibold mb-1">Recommendation</p>
+                  <p className="text-sm text-gray-300 leading-relaxed">{section.recommendation}</p>
+                </div>
+              )}
+
+              {section.estimatedCost && (
+                <div className="border border-white/5 rounded-xl bg-white/[0.02] p-4">
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Estimated Cost</p>
+                    <p className="text-lg font-bold text-white tabular-nums">{section.estimatedCost}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Section>
+        ))
+      }
+
       {/* Budget Summary */}
       {plan.budget_summary && (
-        <Section icon="💰" title="Budget Summary" defaultOpen delay={350}>
+        <Section icon="💰" title="Budget Summary" defaultOpen delay={350 + (plan.additionalSections?.length ?? 0) * 50}>
           <div className="space-y-4">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

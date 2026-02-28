@@ -11,7 +11,36 @@ If the crew is bringing equipment (camera gear, drones, audio kits, lighting, tr
 - Drone regulations: if a drone is listed, include local drone laws and permit requirements for the destination
 - Packing: include equipment-specific packing advice (rain covers, cases, power adapters)
 
-Use this exact JSON structure: { "flights": { "options": [{ "airline": string, "route": string, "origin_code": string, "destination_code": string, "type": string, "price_per_person": string }], "recommendation": string, "estimated_total": string }, "accommodation": { "options": [{ "type": string, "name_or_area": string, "price_per_night": string, "pros": string }], "recommendation": string, "estimated_total": string }, "transportation": { "recommendation": string, "details": string, "daily_cost": string, "estimated_total": string, "money_saving_note": string }, "game_tickets": { "games": [{ "matchup": string, "venue": string, "date": string, "price_range": string }], "media_credential_note": string, "estimated_total": string }, "content_locations": { "pregame": [{ "name": string, "why": string }], "broll": [{ "name": string, "why": string }], "between_events": [{ "name": string, "why": string }] }, "weather_packing": { "forecast": string, "temperatures": string, "rain_chance": string, "pack_list": [string] }, "safety_briefing": { "overview": string, "areas": [{ "name": string, "safety_level": string, "notes": string }], "emergency_number": string, "nearest_embassy": string }, "budget_summary": { "categories": [{ "name": string, "low": number, "high": number }], "total_low": number, "total_high": number, "budget_status": string, "notes": string } }`;
+DYNAMIC ADDITIONAL SECTIONS:
+Analyze the user's notes and trip details for any additional activities, interests, or needs beyond the standard categories (flights, accommodation, game tickets, content locations, embassy). Examples of additional categories you might detect:
+- "Golf" → create a Golf section with course recommendations, tee time booking info, pricing
+- "Dinner" or "restaurants" → create a Dining section with restaurant recommendations and reservation links
+- "Spa" or "massage" → create a Wellness section
+- "Shopping" → create a Shopping section with areas/malls
+- "Nightlife" or "bars" or "clubs" → create a Nightlife section
+- "Museum" or "history" or "tours" → create a Sightseeing section
+- "Gym" or "workout" → create a Fitness section
+- "Kids" or "family" → create a Family Activities section
+- "Beach" → create a Beach section
+- "Rental car" or "driving" → create a Transportation section
+- "Visa" or "documents" → create a Travel Documents section
+- Any other specific activity mentioned → create an appropriately named section
+
+Only create these sections if the user's input warrants them. If someone just says "flying to London for the Jags game", return "additionalSections": []. If they say "flying to London for the Jags game, want to play golf and find a nice steakhouse", add Golf and Dining sections.
+
+If additional activities are detected, include them in an "additionalSections" array. Each section needs:
+- id: short lowercase identifier (e.g. "golf", "dining")
+- title: display name for the section header (e.g. "Golf", "Dining & Restaurants")
+- icon: single emoji that represents the category (e.g. "⛳", "🍽️")
+- items: array of 2-3 specific recommendations, each with name, description, location, priceRange, bookingTip, and linkQuery (a specific Google search string for booking/viewing, e.g. "The Belfry Golf Course tee time booking")
+- recommendation: your top pick and why (optional)
+- estimatedCost: total estimated cost for this activity as a string (optional)
+- estimatedCostLow: numeric low estimate in USD (include if estimatedCost is provided)
+- estimatedCostHigh: numeric high estimate in USD (include if estimatedCost is provided)
+
+IMPORTANT: When additionalSections have costs, include each one as a row in budget_summary.categories AND factor them into total_low and total_high.
+
+Use this exact JSON structure: { "flights": { "options": [{ "airline": string, "route": string, "origin_code": string, "destination_code": string, "type": string, "price_per_person": string }], "recommendation": string, "estimated_total": string }, "accommodation": { "options": [{ "type": string, "name_or_area": string, "price_per_night": string, "pros": string }], "recommendation": string, "estimated_total": string }, "transportation": { "recommendation": string, "details": string, "daily_cost": string, "estimated_total": string, "money_saving_note": string }, "game_tickets": { "games": [{ "matchup": string, "venue": string, "date": string, "price_range": string }], "media_credential_note": string, "estimated_total": string }, "content_locations": { "pregame": [{ "name": string, "why": string }], "broll": [{ "name": string, "why": string }], "between_events": [{ "name": string, "why": string }] }, "weather_packing": { "forecast": string, "temperatures": string, "rain_chance": string, "pack_list": [string] }, "safety_briefing": { "overview": string, "areas": [{ "name": string, "safety_level": string, "notes": string }], "emergency_number": string, "nearest_embassy": string }, "budget_summary": { "categories": [{ "name": string, "low": number, "high": number }], "total_low": number, "total_high": number, "budget_status": string, "notes": string }, "additionalSections": [{ "id": string, "title": string, "icon": string, "items": [{ "name": string, "description": string, "location": string, "priceRange": string, "bookingTip": string, "linkQuery": string }], "recommendation": string, "estimatedCost": string, "estimatedCostLow": number, "estimatedCostHigh": number }] }`;
 
 interface TripInput {
   departing_from: string;
