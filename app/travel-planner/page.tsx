@@ -2,10 +2,18 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import {
+  getFlightBookingUrl,
+  getHotelBookingUrl,
+  getTicketUrl,
+  getLocationUrl,
+  getEmbassyUrl,
+  parseRouteCodes,
+} from "@/lib/booking-links";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-interface FlightOption { airline: string; route: string; type: string; price_per_person: string; url?: string }
+interface FlightOption { airline: string; route: string; origin_code?: string; destination_code?: string; type: string; price_per_person: string; url?: string }
 interface AccomOption { type: string; name_or_area: string; price_per_night: string; pros: string; url?: string }
 interface Game { matchup: string; venue: string; date: string; price_range: string; url?: string }
 interface Location { name: string; why: string; url?: string }
@@ -187,7 +195,15 @@ const NEED_TO_SECTION: Record<string, string> = {
   "Safety Briefing": "safety_briefing",
 };
 
-function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
+interface TripContext {
+  origin: string;
+  destination: string;
+  arrival: string;
+  departure: string;
+  crewSize: number;
+}
+
+function AIItinerary({ plan, needs, ctx }: { plan: TripPlan; needs: string[]; ctx: TripContext }) {
   const activeKeys = new Set(needs.map((n) => NEED_TO_SECTION[n]).filter(Boolean));
 
   return (
@@ -197,16 +213,27 @@ function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
         <Section icon="✈️" title="Flights" defaultOpen delay={0}>
           <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
-              {plan.flights.options?.map((opt, i) => (
-                <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-sm text-white font-medium">{opt.airline}</p>
-                    <BookingLink url={opt.url} />
+              {plan.flights.options?.map((opt, i) => {
+                const codes = parseRouteCodes(opt.route);
+                const link = getFlightBookingUrl({
+                  airline: opt.airline,
+                  origin: opt.origin_code || codes?.origin || "",
+                  destination: opt.destination_code || codes?.destination || "",
+                  departDate: ctx.arrival,
+                  returnDate: ctx.departure,
+                  passengers: ctx.crewSize,
+                });
+                return (
+                  <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm text-white font-medium">{opt.airline}</p>
+                      <BookingLink url={link.url} label={link.isDirect ? "Book →" : "Search →"} />
+                    </div>
+                    <p className="text-xs text-gray-400">{opt.route}</p>
+                    <p className="text-xs text-gray-500 mt-1">{opt.type} — {opt.price_per_person}/person</p>
                   </div>
-                  <p className="text-xs text-gray-400">{opt.route}</p>
-                  <p className="text-xs text-gray-500 mt-1">{opt.type} — {opt.price_per_person}/person</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {plan.flights.recommendation && (
               <div className="border border-emerald-400/20 bg-emerald-500/5 rounded-xl p-4">
@@ -229,16 +256,25 @@ function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
         <Section icon="🏨" title="Accommodation" defaultOpen delay={50}>
           <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
-              {plan.accommodation.options?.map((opt, i) => (
-                <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-sm font-bold text-white">{opt.type}: {opt.name_or_area}</p>
-                    <BookingLink url={opt.url} label="View →" />
+              {plan.accommodation.options?.map((opt, i) => {
+                const link = getHotelBookingUrl({
+                  name: opt.name_or_area,
+                  location: ctx.destination,
+                  provider: opt.type,
+                  checkIn: ctx.arrival,
+                  checkOut: ctx.departure,
+                });
+                return (
+                  <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-bold text-white">{opt.type}: {opt.name_or_area}</p>
+                      <BookingLink url={link.url} label={link.isDirect ? "View →" : "Search →"} />
+                    </div>
+                    <p className="text-xs text-gray-400 leading-relaxed mb-2">{opt.pros}</p>
+                    <p className="text-xs text-gray-500">{opt.price_per_night}/night</p>
                   </div>
-                  <p className="text-xs text-gray-400 leading-relaxed mb-2">{opt.pros}</p>
-                  <p className="text-xs text-gray-500">{opt.price_per_night}/night</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {plan.accommodation.recommendation && (
               <div className="border border-emerald-400/20 bg-emerald-500/5 rounded-xl p-4">
@@ -288,17 +324,20 @@ function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
         <Section icon="🏟️" title="Game Tickets" delay={150}>
           <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
-              {plan.game_tickets.games?.map((g, i) => (
-                <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500">{g.date}</p>
-                    <BookingLink url={g.url} label="Tickets →" />
+              {plan.game_tickets.games?.map((g, i) => {
+                const link = getTicketUrl({ matchup: g.matchup, venue: g.venue, date: g.date });
+                return (
+                  <div key={i} className="border border-white/10 rounded-xl bg-white/[0.02] p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-bold uppercase tracking-widest text-gray-500">{g.date}</p>
+                      <BookingLink url={link.url} label="Tickets →" />
+                    </div>
+                    <p className="text-sm text-white font-medium mb-1">{g.matchup}</p>
+                    <p className="text-xs text-gray-400">{g.venue}</p>
+                    <p className="text-xs text-gray-500 mt-2">{g.price_range}</p>
                   </div>
-                  <p className="text-sm text-white font-medium mb-1">{g.matchup}</p>
-                  <p className="text-xs text-gray-400">{g.venue}</p>
-                  <p className="text-xs text-gray-500 mt-2">{g.price_range}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {plan.game_tickets.media_credential_note && (
               <div className="border border-emerald-400/20 bg-emerald-500/5 rounded-xl p-4">
@@ -327,7 +366,7 @@ function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
                 </div>
                 <ul className="space-y-1.5">
                   {plan.content_locations.pregame.map((loc, i) => (
-                    <Bullet key={i} accent><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={loc.url} label="View →" /></Bullet>
+                    <Bullet key={i} accent><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={getLocationUrl(loc.name, ctx.destination)} label="Map →" /></Bullet>
                   ))}
                 </ul>
               </div>
@@ -339,7 +378,7 @@ function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
                 </div>
                 <ul className="space-y-1.5">
                   {plan.content_locations.broll.map((loc, i) => (
-                    <Bullet key={i} accent><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={loc.url} label="View →" /></Bullet>
+                    <Bullet key={i} accent><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={getLocationUrl(loc.name, ctx.destination)} label="Map →" /></Bullet>
                   ))}
                 </ul>
               </div>
@@ -351,7 +390,7 @@ function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
                 </div>
                 <ul className="space-y-1.5">
                   {plan.content_locations.between_events.map((loc, i) => (
-                    <Bullet key={i}><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={loc.url} label="View →" /></Bullet>
+                    <Bullet key={i}><span className="text-white font-medium">{loc.name}</span> — {loc.why} <BookingLink url={getLocationUrl(loc.name, ctx.destination)} label="Map →" /></Bullet>
                   ))}
                 </ul>
               </div>
@@ -411,7 +450,7 @@ function AIItinerary({ plan, needs }: { plan: TripPlan; needs: string[] }) {
                   <Bullet accent>Emergency: {plan.safety_briefing.emergency_number}</Bullet>
                 )}
                 {plan.safety_briefing.nearest_embassy && (
-                  <Bullet>Nearest US Embassy: {plan.safety_briefing.nearest_embassy} <BookingLink url={plan.safety_briefing.embassy_url} label="View →" /></Bullet>
+                  <Bullet>Nearest US Embassy: {plan.safety_briefing.nearest_embassy} <BookingLink url={getEmbassyUrl(ctx.destination)} label="View →" /></Bullet>
                 )}
               </ul>
             </div>
@@ -1070,7 +1109,7 @@ export default function TravelPlannerPage() {
               </button>
             </div>
           ) : isAI ? (
-            <AIItinerary plan={aiPlan} needs={needs} />
+            <AIItinerary plan={aiPlan} needs={needs} ctx={{ origin: departingFrom, destination, arrival, departure, crewSize }} />
           ) : (
             <StaticItinerary />
           )}
